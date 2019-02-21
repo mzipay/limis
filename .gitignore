@@ -2,5 +2,7 @@
 venv/
 dist/
 __pycache__/
+.coverage
+htmlcov/
 limis.egg-info
 limis.log
