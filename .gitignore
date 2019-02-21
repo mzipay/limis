@@ -1,5 +1,6 @@
 .idea/
 venv/
 dist/
-limis.egg-info
 __pycache__/
+limis.egg-info
+limis.log
