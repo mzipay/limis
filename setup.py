@@ -20,6 +20,9 @@ setup(
     packages=find_packages(),
     platforms='any',
     python_requires='>=3.5',
+    install_requires=[
+        'tornado',
+    ],
     classifiers=[
         'Development Status :: 1 - Planning',
         'Intended Audience :: Developers',
