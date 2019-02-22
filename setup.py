@@ -19,7 +19,7 @@ setup(
     url='https://limis.io',
     packages=find_packages(),
     platforms='any',
-    python_requires='>=3.3',
+    python_requires='>=3.5',
     install_requires=[
         'tornado',
     ],
