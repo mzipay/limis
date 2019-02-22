@@ -36,7 +36,7 @@ class TestSettings(TestCase):
 
         settings_instance = Settings()
 
-        with self.assertRaises(ModuleNotFoundError):
+        with self.assertRaises(ImportError):
             invalid_module = 'invalid_module'
             settings_instance = Settings([invalid_module])
 

@@ -43,7 +43,7 @@ def initialize_logging():
     if not path.exists():
         raise ValueError(messages.LOGGING_CONFIG_FILE_NOT_FOUND.format(logging_config_file))
 
-    logging.config.fileConfig(logging_config_file)
+    logging.config.fileConfig(str(logging_config_file))
 
     logging.getLogger(__name__).debug(messages.LOGGING_INITIALIZED)
 
@@ -69,7 +69,7 @@ class Settings:
         Initializes the Settings class.
 
         :param additional_settings_modules: List of additional settings modules to load in addition to built-ins
-        :raises ModuleNotFoundError: Error indicating one of the modules was not found.
+        :raises ImportError: Error indicating one of the modules was not found.
         """
         path = Path(__file__).parent.parent
         settings_modules = ['limis.' + package + '.module_settings' for package in find_packages(str(path))]
@@ -89,9 +89,9 @@ class Settings:
                     if setting.isupper():
                         value = getattr(settings_data, setting)
                         setattr(self, setting, value)
-            except ModuleNotFoundError:
+            except ImportError:
                 if not settings_module.startswith('limis'):
-                    raise ModuleNotFoundError(messages.SETTINGS_INIT_MODULE_NOT_FOUND.format(settings_module))
+                    raise ImportError(messages.SETTINGS_INIT_MODULE_NOT_FOUND.format(settings_module))
 
 
 settings = Settings()
