@@ -1,7 +1,8 @@
 limis
 =====
 .. image:: https://travis-ci.org/limis-project/limis.svg?branch=master
-   :alt: limis build status
+    :alt: limis build status
+    :target: https://travis-ci.org/limis-project/limis
 
 limis is a light microservice framework built in `Python <https://www.python.org/>`_ and powered by
 `Tornado <https://www.tornadoweb.org/>`_. The project is currently in active development and should be considered alpha
