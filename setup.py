@@ -20,6 +20,10 @@ setup(
     packages=find_packages(),
     platforms='any',
     python_requires='>=3.5',
+    scripts=['limis/bin/limis-management.py'],
+    entry_points={'console_scripts': [
+        'limis-management = limis.management:execute_limis_management',
+    ]},
     install_requires=[
         'tornado',
     ],
@@ -30,6 +34,7 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3 :: Only',

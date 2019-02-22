@@ -1,5 +1,5 @@
 COMMAND_CREATE_PROJECT_RUN_COMPLETED = 'Completed creating limis project: "{}".'
-COMMAND_CREATE_PROJECT_RUN_DIRECTORY_ERROR = 'Error: Directory "{}" already exists or parent was not found.'
+COMMAND_CREATE_PROJECT_RUN_ERROR = 'Error creating project in directory: "{}".\nError Message: {}'
 COMMAND_CREATE_PROJECT_RUN_STARTED = 'Creating limis project: "{}".'
 COMMAND_LINE_INTERFACE_COMMAND_REQUIRED = 'Error: Command required, none specified.\n\nValid commands:'
 COMMAND_LINE_INTERFACE_HELP_COMMAND = '{} - {}'

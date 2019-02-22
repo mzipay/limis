@@ -112,8 +112,8 @@ class CreateProject(Command):
         try:
             copytree(str(project_template_directory), str(directory))
             move(str(directory / 'project'), str(directory / name))
-        except OSError:
-            print(messages.COMMAND_CREATE_PROJECT_RUN_DIRECTORY_ERROR.format(directory))
+        except OSError as error:
+            print(messages.COMMAND_CREATE_PROJECT_RUN_ERROR.format(str(directory), str(error)))
             return False
 
         cls.__replace_template_strings(directory, ['name'], [name])
