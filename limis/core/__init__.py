@@ -52,11 +52,11 @@ class Settings:
     """
     Settings for global application
 
-    Most packages defined within limis have a module_settings.py file and the default settings are loaded for each of
-    those modules. Settings may be overrode by passing additional settings modules to the class initialization method.
-    Additional settings modules specified are loaded after limis modules. Limis packages without a module_settings.py
-    are ignored, modules passed with additional_settings_modules or the environment variable that do not exist will
-    raise an error.
+    Most packages defined within limis have a settings.py file and the default settings are loaded for each of those
+    modules. Settings may be overwritten by passing additional settings modules to the class initialization method.
+    Additional settings modules specified are loaded after limis modules. Limis packages without settings.py are
+    ignored, modules passed with additional_settings_modules or the environment variable that do not exist will raise
+    an error.
 
     Project specific settings are loaded from the environment variable "LIMIS_PROJECT_SETTINGS_MODULE".
 
@@ -72,7 +72,7 @@ class Settings:
         :raises ImportError: Error indicating one of the modules was not found.
         """
         path = Path(__file__).parent.parent
-        settings_modules = ['limis.' + package + '.module_settings' for package in find_packages(str(path))]
+        settings_modules = ['limis.' + package + '.settings' for package in find_packages(str(path))]
 
         if additional_settings_modules:
             settings_modules = settings_modules + additional_settings_modules
