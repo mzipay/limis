@@ -6,9 +6,11 @@ python:
 - '3.7'
 install:
   - pip install tornado
+  - pip install coverage
   - pip install codecov
-script: python -m unittest
+script: coverage run -m unittest
 after_success:
+  - coverage xml
   - codecov -t 2d1d980c-7f20-4950-82c6-5188b5760083
 notifications:
   slack:
