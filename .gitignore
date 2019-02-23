@@ -4,6 +4,7 @@ dist/
 __pycache__/
 *.pyc
 .coverage
+coverage.xml
 htmlcov/
 docs/build/
 limis.egg-info
