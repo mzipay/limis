@@ -5,9 +5,7 @@ python:
 - '3.6'
 - '3.7'
 install:
-  - pip install tornado
-  - pip install coverage
-  - pip install codecov
+  - pip install -r tests/requirements.txt
 script: coverage run -m unittest
 after_success:
   - coverage xml
