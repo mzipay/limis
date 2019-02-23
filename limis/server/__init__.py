@@ -33,11 +33,21 @@ class Server:
         """
         self.logger = logging.getLogger(__name__)
 
+        self._running = False
         self.stop_server = False
 
         self.router = router
         self.port = settings.SERVER_PORT if port is None else port
         self.server = HTTPServer(router)
+
+    @property
+    def running(self):
+        """
+        Property to get the currently running status of the server.
+
+        :return: running status
+        """
+        return self._running
 
     def _signal_handler(self, signal_number: int, frame: Any):
         """
@@ -69,11 +79,15 @@ class Server:
 
         self.server.listen(self.port)
 
+        self._running = True
+
         PeriodicCallback(self.stop, 100).start()
         IOLoop.current().start()
 
         self.server.close_all_connections()
         IOLoop.current().close(all_fds=True)
+
+        self._running = False
 
         self.logger.info(messages.SERVER_START_STOPPED)
 

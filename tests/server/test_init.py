@@ -9,8 +9,18 @@ from limis.server import Server
 
 
 class TestServer(TestCase):
-    @classmethod
-    def __listening(cls, port):
+    def tearDown(self):
+        try:
+            if server.running:
+                server.stop_server = True
+
+                while server.running:
+                    time.sleep(1)
+        except NameError:
+            pass
+
+    @staticmethod
+    def __listening(port):
         test_socket = socket.socket()
 
         try:
@@ -22,8 +32,8 @@ class TestServer(TestCase):
 
         return True
 
-    @classmethod
-    def __run_server(cls):
+    @staticmethod
+    def __run_server():
         global server
 
         server = Server(None)
