@@ -1,3 +1,8 @@
+"""
+limis management commands
+
+Individual command definition for management command line tool.
+"""
 import fileinput
 import os
 
@@ -64,7 +69,7 @@ class CreateProject(Command):
         Replaces template strings with values in a new project.
 
         :param project_directory: New project directory.
-        :param template_strings: List of template strings to replace, should be name only without template '{{}}'
+        :param template_strings: List of template strings to replace, should be name only without template {{}}
         characters.
         :param value_strings: List of strings to replace template strings with.
         """

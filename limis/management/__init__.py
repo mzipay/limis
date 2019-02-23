@@ -1,3 +1,8 @@
+"""
+limis management module
+
+Defines a command line interface framework for working with limis projects.
+"""
 import sys
 
 from limis.management import exit_codes, messages
