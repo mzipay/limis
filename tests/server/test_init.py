@@ -9,16 +9,6 @@ from limis.server import Server
 
 
 class TestServer(TestCase):
-    def tearDown(self):
-        try:
-            if server.running:
-                server.stop_server = True
-
-                while server.running:
-                    time.sleep(1)
-        except NameError:
-            pass
-
     @staticmethod
     def __listening(port):
         test_socket = socket.socket()
@@ -41,7 +31,36 @@ class TestServer(TestCase):
         server.start()
 
     def test_init(self):
-        server = Server(None)
+        thread = threading.Thread(target=TestServer.__run_server)
+        thread.daemon = True
+        thread.start()
+
+        time.sleep(1)
+
+        if server.running:
+            server.stop_server = True
+
+            while server.running:
+                time.sleep(1)
+
+    def test_running_property(self):
+        test_server = Server(None)
+
+        self.assertFalse(test_server.running)
+
+        thread = threading.Thread(target=TestServer.__run_server)
+        thread.daemon = True
+        thread.start()
+
+        time.sleep(1)
+
+        self.assertTrue(server.running)
+
+        server.stop_server = True
+        while thread.is_alive():
+            time.sleep(1)
+
+        self.assertFalse(server.running)
 
     def test_start_stop(self):
         thread = threading.Thread(target=TestServer.__run_server)

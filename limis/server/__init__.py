@@ -77,9 +77,9 @@ class Server:
         except RuntimeError:
             asyncio.set_event_loop(asyncio.new_event_loop())
 
-        self.server.listen(self.port)
-
         self._running = True
+
+        self.server.listen(self.port)
 
         PeriodicCallback(self.stop, 100).start()
         IOLoop.current().start()
