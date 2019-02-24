@@ -1,6 +1,7 @@
 import os
 
 from distutils.version import StrictVersion
+from pathlib import Path
 from unittest import TestCase
 
 import limis
@@ -15,12 +16,14 @@ class TestMethods(TestCase):
     def test_initialize_logging(self):
         initialize_logging()
 
-        os.environ['LIMIS_PROJECT_SETTINGS_MODULE'] = 'tests.core.data.settings_logging'
+        path = Path(__file__).parent / 'data/settings_logging.ini'
+
+        os.environ['LIMIS_PROJECT_SETTINGS'] = str(path)
 
         with self.assertRaises(ValueError):
             initialize_logging()
 
-        os.environ.pop('LIMIS_PROJECT_SETTINGS_MODULE')
+        os.environ.pop('LIMIS_PROJECT_SETTINGS')
 
     def test_get_version(self):
         version = get_version()
@@ -28,26 +31,21 @@ class TestMethods(TestCase):
 
 
 class TestSettings(TestCase):
-    def tearDown(self):
-        remove_logfile()
-
     def test_init(self):
-        initialize_logging()
-
         settings_instance = Settings()
 
-        with self.assertRaises(ImportError):
-            invalid_module = 'invalid_module'
-            settings_instance = Settings([invalid_module])
+        with self.assertRaises(ValueError):
+            settings_instance = Settings(['invalid_file'])
 
-        settings_instance = Settings(['tests.core.data.settings'])
+        path = Path(__file__).parent / 'data/settings.ini'
+        settings_instance = Settings([str(path)])
 
-        self.assertEqual(settings_instance.VALID_SETTING, 'valid')
-        self.assertFalse(hasattr(settings_instance, 'invalid_setting'))
+        self.assertTrue(hasattr(settings_instance, 'test_settings'))
+        self.assertEqual(settings_instance.test_settings['valid_setting'], 'valid')
         self.assertFalse(hasattr(settings_instance, 'nonexistent_setting'))
 
-        os.environ['LIMIS_PROJECT_SETTINGS_MODULE'] = 'tests.core.data.settings'
+        os.environ['LIMIS_PROJECT_SETTINGS'] = str(path)
 
         settings_instance = Settings()
-        self.assertEqual(settings_instance.VALID_SETTING, 'valid')
+        self.assertEqual(settings_instance.test_settings['valid_setting'], 'valid')
 

@@ -30,6 +30,7 @@ class Server:
         :param router: Tornado router object containing the base routing definition for the application. This is
           most common a single Application instance, or a RuleRouter.
         :param port: The port number for the server to listen on, this defaults to the SERVER_PORT setting.
+        :raises ValueError: Error indicating the port specified in settings is not valid.
         """
         self.logger = logging.getLogger(__name__)
 
@@ -37,7 +38,15 @@ class Server:
         self.stop_server = False
 
         self.router = router
-        self.port = settings.SERVER_PORT if port is None else port
+
+        try:
+            self.port = int(settings.server['port'] if port is None else port)
+        except ValueError:
+            msg = messages.SERVER_INIT_SETTINGS_INVALID_PORT.format(settings.server['port'])
+
+            self.logger.error(msg)
+            raise ValueError(msg)
+
         self.server = HTTPServer(router)
 
     @property

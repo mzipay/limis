@@ -1,3 +1,3 @@
 LOGGING_CONFIG_FILE_NOT_FOUND = 'Logging configuration file "{}" not found.'
 LOGGING_INITIALIZED = 'Logging initialized.'
-SETTINGS_INIT_MODULE_NOT_FOUND = 'Module "{}" not found.'
+SETTINGS_LOAD_SETTINGS_FILE_NOT_FOUND = 'Settings file "{}" not found.'
