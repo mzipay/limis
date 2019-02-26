@@ -9,6 +9,7 @@ import os
 
 from configparser import ConfigParser
 from distutils.version import StrictVersion
+from importlib import import_module
 from pathlib import Path
 from setuptools import find_packages
 from typing import List
@@ -17,6 +18,7 @@ from limis import VERSION
 from limis.core import messages
 
 
+LIMIS_PROJECT_NAME_ENVIRONMENT_VARIABLE = 'LIMIS_PROJECT_NAME'
 LIMIS_PROJECT_SETTINGS_ENVIRONMENT_VARIABLE = 'LIMIS_PROJECT_SETTINGS'
 
 
@@ -46,9 +48,23 @@ def initialize_logging():
         if not path.exists():
             raise ValueError(messages.LOGGING_CONFIG_FILE_NOT_FOUND.format(logging_config_file))
 
-    logging.config.fileConfig(str(logging_config_file))
+    logging.config.fileConfig(str(path))
 
     logging.getLogger(__name__).debug(messages.LOGGING_INITIALIZED)
+
+
+def get_root_services():
+    """
+    Returns the root services module as defined in settings. Settings attribute is set by the "LIMIS_PROJECT_NAME"
+    environment variable, and the settings key is 'root_services'.
+    """
+    try:
+        root_services_name = getattr(settings, os.environ.get(LIMIS_PROJECT_NAME_ENVIRONMENT_VARIABLE))['root_services']
+        module = import_module(root_services_name)
+    except(AttributeError, ImportError):
+        return None
+
+    return module
 
 
 class Settings:
@@ -78,7 +94,7 @@ class Settings:
         ]
 
         if additional_settings_files:
-            additional_settings_files_as_paths = [ Path(settings_file) for settings_file in additional_settings_files]
+            additional_settings_files_as_paths = [Path(settings_file) for settings_file in additional_settings_files]
             self._settings_files = self._settings_files + additional_settings_files_as_paths
 
         project_settings_file = os.environ.get(LIMIS_PROJECT_SETTINGS_ENVIRONMENT_VARIABLE)
