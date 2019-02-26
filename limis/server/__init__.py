@@ -68,6 +68,13 @@ class Server:
         if signal_number == signal.SIGINT:
             self.stop_server = True
 
+    def _started(self):
+        """
+        Sets the running status of the server after it has been started.
+        """
+        self._running = True
+        self.logger.info(messages.SERVER_START_STARTED)
+
     def start(self):
         """
         Starts the server.
@@ -86,11 +93,10 @@ class Server:
         except RuntimeError:
             asyncio.set_event_loop(asyncio.new_event_loop())
 
-        self._running = True
-
         self.server.listen(self.port)
 
         PeriodicCallback(self.stop, 100).start()
+        IOLoop.current().add_callback(self._started)
         IOLoop.current().start()
 
         self.server.close_all_connections()
