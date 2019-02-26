@@ -55,14 +55,22 @@ def initialize_logging():
 
 def get_root_services():
     """
-    Returns the root services module as defined in settings. Settings attribute is set by the "LIMIS_PROJECT_NAME"
-    environment variable, and the settings key is 'root_services'.
+    Returns the root services module as defined in settings. Settings attribute is set by the
+    "<project_name>['root_services']" value. LIMIS_PROJECT_NAME environment variable is used to set the project_name'.
     """
+    project_name = os.environ.get(LIMIS_PROJECT_NAME_ENVIRONMENT_VARIABLE)
+
     try:
-        root_services_name = getattr(settings, os.environ.get(LIMIS_PROJECT_NAME_ENVIRONMENT_VARIABLE))['root_services']
+        root_services_name = getattr(Settings(), project_name)['root_services']
+    except AttributeError:
+        raise AttributeError(messages.GET_ROOT_SERVICES_INVALID_PROJECT_ERROR.format(project_name))
+    except TypeError:
+        raise TypeError(messages.GET_ROOT_SERVICES_INVALID_PROJECT_NAME_TYPE)
+
+    try:
         module = import_module(root_services_name)
-    except(AttributeError, ImportError):
-        return None
+    except ImportError:
+        raise ImportError(messages.GET_ROOT_SERVICES_IMPORT_ERROR.format(root_services_name))
 
     return module
 

@@ -5,13 +5,46 @@ from pathlib import Path
 from unittest import TestCase
 
 import limis
-from limis.core import get_version, initialize_logging, Settings
+from limis.core import get_root_services, get_version, initialize_logging, Settings
 from tests import remove_logfile
 
 
 class TestMethods(TestCase):
     def tearDown(self):
         remove_logfile()
+
+    def test_get_root_services(self):
+        with self.assertRaises(TypeError):
+            get_root_services()
+
+        os.environ['LIMIS_PROJECT_NAME'] = 'invalid_project'
+
+        with self.assertRaises(AttributeError):
+            get_root_services()
+
+        os.environ.pop('LIMIS_PROJECT_NAME')
+
+        os.environ['LIMIS_PROJECT_NAME'] = 'test_project'
+
+        path = Path(__file__).parent / 'data/settings_root_services_invalid.ini'
+        os.environ['LIMIS_PROJECT_SETTINGS'] = str(path)
+
+        with self.assertRaises(ImportError):
+            get_root_services()
+
+        path = Path(__file__).parent / 'data/settings_root_services.ini'
+        os.environ['LIMIS_PROJECT_SETTINGS'] = str(path)
+
+        root_services = get_root_services()
+
+        self.assertEqual(root_services.context_root, 'context_root')
+        self.assertEqual(root_services.services, ['test'])
+
+        os.environ.pop('LIMIS_PROJECT_NAME')
+
+    def test_get_version(self):
+        version = get_version()
+        self.assertEqual(version, StrictVersion('.'.join(map(str, limis.VERSION))))
 
     def test_initialize_logging(self):
         initialize_logging()
@@ -24,10 +57,6 @@ class TestMethods(TestCase):
             initialize_logging()
 
         os.environ.pop('LIMIS_PROJECT_SETTINGS')
-
-    def test_get_version(self):
-        version = get_version()
-        self.assertEqual(version, StrictVersion('.'.join(map(str, limis.VERSION))))
 
 
 class TestSettings(TestCase):
