@@ -5,7 +5,8 @@ LIMIS_IMPORT_ERROR = 'Unable to import limis. Please ensure it is installed with
 
 name = '{{name}}'
 
-os.environ['LIMIS_PROJECT_SETTINGS_MODULE'] = '{}.settings'.format(name)
+os.environ['LIMIS_PROJECT_NAME'] = name
+os.environ['LIMIS_PROJECT_SETTINGS'] = '{}/settings.ini'.format(name)
 
 if __name__ == '__main__':
     try:
