@@ -1,4 +1,5 @@
 import logging
+import socket
 
 from pathlib import Path
 
@@ -14,3 +15,16 @@ def remove_logfile(log_filename: str = None):
 
     if log_file.exists():
         log_file.unlink()
+
+
+def listening(port):
+    test_socket = socket.socket()
+
+    try:
+        test_socket.connect(('localhost', port))
+    except socket.error:
+        return False
+    finally:
+        test_socket.close()
+
+    return True
