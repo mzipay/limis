@@ -56,7 +56,7 @@ class CommandLineInterface:
 
         for command in cls.commands:
             if command.name == command_name:
-                return command.run(args)
+                return command().run(args)
 
         print(messages.COMMAND_LINE_INTERFACE_RUN_UNKNOWN_COMMAND.format(command_name))
 
