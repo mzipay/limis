@@ -52,7 +52,9 @@ class ServicesRouter:
         http_rules = []
         websocket_rules = []
 
-        for name, service in self._services.items():
+        for name in sorted(self._services):
+            service = self._services[name]
+
             path = '/{}/.*'.format(service.path)
 
             self.logger.debug(messages.ROUTER_BUILD_ROUTER_RULES_ADD_SERVICE.format(service.name, path))
