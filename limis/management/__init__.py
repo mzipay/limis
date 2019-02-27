@@ -6,7 +6,7 @@ Defines a command line interface framework for working with limis projects.
 import sys
 
 from limis.management import exit_codes, messages
-from limis.management.commands import CreateProject, Version
+from limis.management.commands import CreateProject, Server, Version
 
 
 class CommandLineInterface:
@@ -78,6 +78,7 @@ class LimisProjectManagement(CommandLineInterface):
     Defines the command line interface commands for project level management.
     """
     commands = [
+        Server,
         Version
     ]
 
