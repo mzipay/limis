@@ -12,9 +12,9 @@ from unittest import TestCase
 
 from limis.core import settings
 from limis.management import exit_codes
-from limis.management.commands import Command, CreateProject, Server, Version
+from limis.management.commands import Command, CreateProject, CreateService, Server, Version
 
-from tests import listening
+from tests import listening, string_in_file
 
 
 class TestCommand(TestCase):
@@ -63,7 +63,61 @@ class TestCreateProject(TestCase):
                 self.assertTrue(file.read(), 'name = \'{}\''.format(self.test_project_name))
                 file.close()
 
-            self.assertFalse(command.run([self.test_project_name]))
+            self.assertEqual(command.run([self.test_project_name]), exit_codes.ERROR_CREATING_PROJECT)
+
+
+class TestCreateService(TestCase):
+    def __remove_test_service_directory(self):
+        if self.test_service_directory.exists():
+            shutil.rmtree(str(self.test_service_directory), ignore_errors=False)
+
+    def setUp(self):
+        self.test_service_name = 'test_service'
+        self.test_service_path = 'test_service_path'
+        self.test_service_directory = Path.cwd() / 'test_service'
+
+        self.__remove_test_service_directory()
+
+    def tearDown(self):
+        self.__remove_test_service_directory()
+
+    def test_run(self):
+        with redirect_stdout(io.StringIO()):
+            command = CreateService()
+
+            self.assertEqual(command.run([]), exit_codes.INVALID_ARGUMENTS)
+
+            self.assertEqual(command.run([self.test_service_name]), exit_codes.SUCCESS)
+            self.assertTrue(self.test_service_directory.exists())
+
+            test_service_services_file = str(self.test_service_directory / 'services.py')
+
+            self.assertTrue(string_in_file(test_service_services_file, '{} = {{'.format(self.test_service_name)))
+            self.assertTrue(string_in_file(test_service_services_file,
+                                           '\'name\': \'{}\','.format(self.test_service_name)))
+            self.assertTrue(string_in_file(test_service_services_file,
+                                           '\'path\': \'{}\','.format(self.test_service_name)))
+
+            self.assertEqual(command.run([self.test_service_name]), exit_codes.ERROR_CREATING_SERVICE)
+
+    def test_run_with_path(self):
+        with redirect_stdout(io.StringIO()):
+            command = CreateService()
+
+            self.assertEqual(command.run([self.test_service_name, self.test_service_path]),
+                             exit_codes.SUCCESS)
+
+            self.assertTrue(self.test_service_directory.exists())
+
+            test_service_services_file = str(self.test_service_directory / 'services.py')
+
+            self.assertTrue(string_in_file(test_service_services_file, '{} = {{'.format(self.test_service_name)))
+            self.assertTrue(string_in_file(test_service_services_file,
+                                           '\'name\': \'{}\','.format(self.test_service_name)))
+            self.assertTrue(string_in_file(test_service_services_file,
+                                           '\'path\': \'{}\','.format(self.test_service_path)))
+
+            self.assertEqual(command.run([self.test_service_name]), exit_codes.ERROR_CREATING_SERVICE)
 
 
 class TestServer(TestCase):

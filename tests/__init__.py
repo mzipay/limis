@@ -4,7 +4,20 @@ import socket
 from pathlib import Path
 
 
-def remove_logfile(log_filename: str = None):
+def listening(port):
+    test_socket = socket.socket()
+
+    try:
+        test_socket.connect(('localhost', port))
+    except socket.error:
+        return False
+    finally:
+        test_socket.close()
+
+    return True
+
+
+def remove_logfile():
     logger = logging.getLogger()
     for handler in list(logger.handlers):
         logger.removeHandler(handler)
@@ -17,14 +30,15 @@ def remove_logfile(log_filename: str = None):
         log_file.unlink()
 
 
-def listening(port):
-    test_socket = socket.socket()
+def string_in_file(filename: str, string: str):
+    found = False
 
-    try:
-        test_socket.connect(('localhost', port))
-    except socket.error:
-        return False
-    finally:
-        test_socket.close()
+    with open(filename) as file:
+        lines = file.readlines()
 
-    return True
+        if len(list(filter(lambda x: string in x, lines))) > 0:
+            found = True
+
+        file.close()
+
+    return found

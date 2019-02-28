@@ -3,11 +3,7 @@ limis management commands
 
 Individual command definition for management command line tool.
 """
-import fileinput
 import getopt
-import glob
-import os
-import re
 import signal
 import time
 
@@ -20,6 +16,7 @@ from typing import Any, List
 from tornado.routing import RuleRouter
 
 from limis.core import get_root_services, get_version, initialize_logging, settings
+from limis.core.utilities import replace_template_strings
 from limis.management import exit_codes, messages
 from limis.server import Server as LimisServer
 from limis.services.router import ServicesRouter
@@ -72,36 +69,10 @@ class CreateProject(Command):
     help_arguments = '<project_name> [project_directory]'
     name = 'create_project'
 
-    @classmethod
-    def __replace_template_strings(cls, project_directory: Path, template_strings: List[str], value_strings: List[str]):
-        """
-        Replaces template strings with values in a new project.
-
-        :param project_directory: New project directory.
-        :param template_strings: List of template strings to replace, should be name only without template {{}}
-        characters.
-        :param value_strings: List of strings to replace template strings with.
-        """
-        cwd = Path.cwd()
-        os.chdir(str(project_directory))
-
-        for entry in glob.iglob(str(project_directory) + '/**', recursive=True):
-            if not os.path.isdir(entry) and not entry.startswith('__pycache__') and not entry.endswith('pyc'):
-                with fileinput.FileInput(entry, inplace=True) as file:
-                    for line in file:
-                        for i in enumerate(template_strings):
-                            template_string = i[1]
-                            value_string = value_strings[i[0]]
-
-                            regex = '{{%s}}' % template_string
-                            print(re.sub(regex, value_string, line), end='')
-
-        os.chdir(str(cwd))
-
     def run(self, args: List[str]) -> int:
         """
         Executes the create_project command. This command creates a new limis project based on the project template that
-        is stored in limis.core.project_template. If the directory is not passed with the arguments the current
+        is stored in limis.resources.project_template. If the directory is not passed with the arguments the current
         working directory is used as the parent and new directory with the project name will be created.
 
         :param args: Arguments should be a list with the project name and optionally the project directory.
@@ -128,11 +99,59 @@ class CreateProject(Command):
             move(str(directory / 'project'), str(directory / name))
         except OSError as error:
             print(messages.COMMAND_CREATE_PROJECT_RUN_ERROR.format(str(directory), str(error)))
-            return False
+            return exit_codes.ERROR_CREATING_PROJECT
 
-        self.__replace_template_strings(directory, ['name'], [name])
+        replace_template_strings(directory, ['name'], [name])
 
         print(messages.COMMAND_CREATE_PROJECT_RUN_COMPLETED.format(name))
+
+        return exit_codes.SUCCESS
+
+
+class CreateService(Command):
+    """
+    CreateService
+
+    Creates a new limis service in the current project.
+    """
+    help = 'Create a limis service'
+    help_arguments = 'service_name [path]'
+    name = 'create_service'
+
+    def run(self, args: List[str]) -> int:
+        """
+        Executes the create_service command. This command creates a new limis service based on the service template that
+        is stored in limis.resources.service_template. If the path is not passed with the arguments the service name
+        is used as the default path.
+
+        :param args: Arguments should be a list with the service name and an optional path
+        :return: Command line exit code
+        """
+        if len(args) < 1 or len(args) > 2:
+            return self.invalid_arguments()
+
+        name = args[0]
+
+        if len(args) == 2:
+            path = args[1]
+        else:
+            path = name
+
+        print(messages.COMMAND_CREATE_SERVICE_RUN_STARTED.format(name))
+
+        directory = Path.cwd() / name
+
+        service_template_directory = Path(__file__).parent.parent / Path('resources/service_template')
+
+        try:
+            copytree(str(service_template_directory), str(directory))
+        except OSError as error:
+            print(messages.COMMAND_CREATE_SERVICE_RUN_ERROR.format(str(directory), str(error)))
+            return exit_codes.ERROR_CREATING_SERVICE
+
+        replace_template_strings(directory, ['name', 'path'], [name, path])
+
+        print(messages.COMMAND_CREATE_SERVICE_RUN_COMPLETED.format(name))
 
         return exit_codes.SUCCESS
 
