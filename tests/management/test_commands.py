@@ -67,19 +67,24 @@ class TestCreateProject(TestCase):
 
 
 class TestCreateService(TestCase):
-    def __remove_test_service_directory(self):
+    def __remove_test_service_directories(self):
         if self.test_service_directory.exists():
             shutil.rmtree(str(self.test_service_directory), ignore_errors=False)
+
+        if self.test_service_with_path_directory.exists():
+            shutil.rmtree(str(self.test_service_with_path_directory), ignore_errors=False)
+
 
     def setUp(self):
         self.test_service_name = 'test_service'
         self.test_service_path = 'test_service_path'
         self.test_service_directory = Path.cwd() / 'test_service'
+        self.test_service_with_path_directory = Path.cwd() / 'test_service_path'
 
-        self.__remove_test_service_directory()
+        self.__remove_test_service_directories()
 
     def tearDown(self):
-        self.__remove_test_service_directory()
+        self.__remove_test_service_directories()
 
     def test_run(self):
         with redirect_stdout(io.StringIO()):
@@ -92,11 +97,9 @@ class TestCreateService(TestCase):
 
             test_service_services_file = str(self.test_service_directory / 'services.py')
 
-            self.assertTrue(string_in_file(test_service_services_file, '{} = {{'.format(self.test_service_name)))
             self.assertTrue(string_in_file(test_service_services_file,
-                                           '\'name\': \'{}\','.format(self.test_service_name)))
-            self.assertTrue(string_in_file(test_service_services_file,
-                                           '\'path\': \'{}\','.format(self.test_service_name)))
+                                           'Service(name=\'{}\', path=\'{}\', components=[]),'
+                                           .format(self.test_service_name, self.test_service_name)))
 
             self.assertEqual(command.run([self.test_service_name]), exit_codes.ERROR_CREATING_SERVICE)
 
@@ -107,17 +110,16 @@ class TestCreateService(TestCase):
             self.assertEqual(command.run([self.test_service_name, self.test_service_path]),
                              exit_codes.SUCCESS)
 
-            self.assertTrue(self.test_service_directory.exists())
+            self.assertTrue(self.test_service_with_path_directory.exists())
 
-            test_service_services_file = str(self.test_service_directory / 'services.py')
+            test_service_services_file = str(self.test_service_with_path_directory / 'services.py')
 
-            self.assertTrue(string_in_file(test_service_services_file, '{} = {{'.format(self.test_service_name)))
             self.assertTrue(string_in_file(test_service_services_file,
-                                           '\'name\': \'{}\','.format(self.test_service_name)))
-            self.assertTrue(string_in_file(test_service_services_file,
-                                           '\'path\': \'{}\','.format(self.test_service_path)))
+                                           'Service(name=\'{}\', path=\'{}\', components=[]),'
+                                           .format(self.test_service_name, self.test_service_name)))
 
-            self.assertEqual(command.run([self.test_service_name]), exit_codes.ERROR_CREATING_SERVICE)
+            self.assertEqual(command.run([self.test_service_name, self.test_service_path]),
+                             exit_codes.ERROR_CREATING_SERVICE)
 
 
 class TestServer(TestCase):
