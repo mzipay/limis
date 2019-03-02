@@ -8,7 +8,8 @@ from limis.services.components import action, Component, Resource
 
 class TestComponent(TestCase):
     class TestComponent(Component):
-        component_name = 'testcomponent'
+        component_name = 'test_component'
+        component_path = 'test_component'
         test_attribute = 'test_attribute'
 
         @classmethod
@@ -18,6 +19,20 @@ class TestComponent(TestCase):
 
     def test_init(self):
         component = TestComponent()
+
+    def test_init_improperly_configured_component_name(self):
+        class ImproperlyConfiguredComponent(Component):
+            component_path = 'test_component'
+
+        with self.assertRaises(ValueError):
+            component = ImproperlyConfiguredComponent()
+
+    def test_init_improperly_configured_component_path(self):
+        class ImproperlyConfiguredComponent(Component):
+            component_name = 'test_component'
+
+        with self.assertRaises(ValueError):
+            component = ImproperlyConfiguredComponent()
 
     def test__get_method_name(self):
         self.assertEqual(Component._get_method_name(), 'test__get_method_name')

@@ -95,6 +95,19 @@ class TestService(TestCase):
         self.assertTrue(log.output[0].find(
             messages.SERVICE_ADD_COMPONENT_WITH_NO_HANDLER.format(self.TestResource.component_name, 'service')))
 
+    def test_add_component_with_invalid_component_class(self):
+        service = Service(name='service', components=[])
+
+        with self.assertRaises(ValueError):
+            with self.assertLogs(logger=self.logger, level='ERROR') as log:
+                service.add_component(Service)
+
+        self.assertTrue(log.output[0].find(
+            messages.SERVICE_ADD_COMPONENT_INVALID_COMPONENT_CLASS.format(Service.__name__)))
+
+    def test_add_Component_with_invalid_component_type(self):
+        service = Service(name='service', components=[])
+
         with self.assertRaises(TypeError):
             with self.assertLogs(logger=self.logger, level='ERROR') as log:
                 invalid_component = 'invalid_component'
