@@ -29,11 +29,81 @@ Project Creation
 
 Service Creation
 ~~~~~~~~~~~~~~~~
+* Scaffold the services with the project management command:
+
 .. code-block::
 
     cd <project_name>
-    ./management create_service <service_name>
+    python management.py create_service <service_name>
 
-* Create your service components in '<service_name>/components.py'
-* Add component classes to 'components' attribute of the service definition of '<service_name>/services.py'
-* Add new service to the project services file '<project_name>/services.py'
+* Create a request handler to route service requests to your component in '<service_name>/handlers.py':
+
+.. code-block:: python
+
+    from limis.services.handlers import ComponentHTTPHandler
+
+
+    class HelloHandler(ComponentHTTPHandler):
+        def get(self):
+            self.write(self.component_class().hello())
+
+* Create a component to perform actions on requests in '<service_name>/components.py':
+
+.. code-block:: python
+
+    from limis.services.components import Component
+
+    from hello.handlers import HelloHandler
+
+
+    class HelloComponent(Component):
+        component_name = 'hello'
+        component_path = 'hello'
+        component_http_handler = HelloHandler
+
+        def hello(self):
+            return 'hello'
+
+* Create a services configuration entry in '<service_name>'/services.py:
+
+.. code-block:: python
+
+    from limis.services import Service
+
+    from hello.components import HelloComponent
+
+
+    services = [
+        Service(name='hello', path='hello', components=[HelloComponent]),
+    ]
+
+* Add your services module to the project services configuration '<project_name>/services.py':
+
+.. code-block:: python
+
+    from hello.services import services as hello_services
+
+
+    context_root = ''
+    services = hello_services
+
+Launch Server
+~~~~~~~~~~~~~
+Launch the limis server from the command prompt:
+
+.. code-block::
+
+    python manage.py server --http
+
+Test Service
+~~~~~~~~~~~~
+
+.. code-block::
+
+    curl http://localhost:8080/hello/hello
+
+Output:
+
+.. code-block::
+
+    hello
