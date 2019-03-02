@@ -139,7 +139,7 @@ class CreateService(Command):
 
         print(messages.COMMAND_CREATE_SERVICE_RUN_STARTED.format(name))
 
-        directory = Path.cwd() / name
+        directory = Path.cwd() / path
 
         service_template_directory = Path(__file__).parent.parent / Path('resources/service_template')
 
