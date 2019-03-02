@@ -38,28 +38,48 @@ class Component(ABC):
         * :class:`.Resource`
 
     :attribute component_name: The name of the component.
+    :attribute component_path: The path of the component.
+    :attribute component_http_handler: The HTTP handler for the component.
+    :attribute component_websocket_handler: The WebSocket handler for the component.
     :attribute exclude_attributes: Class attribute of excluded attributes for serialization, this should be set in your
       inherited class.
     :attribute system_exclude_attributes: Class attribute of system excluded attributes for serialization, this should
       generally not be set by your inherited class.
-    """
-    component_name = 'Component'
-    exclude_attributes = []
-    system_exclude_attributes = ['component_name', 'logger', 'http_handler', 'websocket_handler']
 
-    def __init__(self, path: str = None, http_handler: Type[RequestHandler] = None,
-                 websocket_handler: Type[WebSocketHandler] = None):
+    The 'component_name' and '_omponent_path' attributes must be set by your inherited component.
+    """
+    component_name = None
+    component_path = None
+    component_http_handler = None
+    component_websocket_handler = None
+
+    exclude_attributes = []
+    system_exclude_attributes = [
+        'component_name', 'component_path',
+        'component_http_handler', 'component_websocket_handler',
+        'logger'
+    ]
+
+    def __init__(self):
         """
         Initializes Component class.
 
-        :param path: Component path used to determine the request handler URL path, if None name is used for path value.
-        :param http_handler: Component HTTP request handler.
-        :param websocket_handler: Component WebSocket request handler.
+        :raises ValueError: Error indicating the component is not properly configured.
         """
         self.logger = logging.getLogger(__name__)
-        self.path = (self.component_name if path is None else path).lower()
-        self.http_handler = http_handler
-        self.websocket_handler = websocket_handler
+        if not isinstance(self.component_name, str):
+            msg = messages.COMPONENT_INIT_NOT_PROPERLY_CONFIGURED_ERROR.format(
+                self.__class__.__name__, 'component_name', 'str')
+
+            self.logger.error(msg)
+            raise ValueError(msg)
+
+        if not isinstance(self.component_path, str):
+            msg = messages.COMPONENT_INIT_NOT_PROPERLY_CONFIGURED_ERROR.format(
+                self.__class__.__name__, 'component_path', 'str')
+
+            self.logger.error(msg)
+            raise ValueError(msg)
 
     @staticmethod
     def _get_method_name():

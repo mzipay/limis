@@ -56,12 +56,14 @@ class TestComponent(TestCase):
 
 class TestResource(TestCase):
     class TestResource(Resource):
-        component_name = 'testresource'
+        component_name = 'test_resource'
+        component_path = 'test_resource'
         test_attribute = 'test attribute'
 
     class TestResourceAdditionalAttribute(Resource):
-        component_name = 'testresource'
-        test_attribute = 'test attribute'
+        component_name = 'test_resource'
+        component_path = 'test_resource'
+        test_attribute = 'test attribute 1'
         test_attribute2 = 'test attribute 2'
 
     def setUp(self):
@@ -71,27 +73,27 @@ class TestResource(TestCase):
         logging.getLogger('limis.services.components').disabled = False
 
     def test_create(self):
-        resource = Resource()
+        resource = self.TestResource()
 
         with self.assertRaises(NotImplementedError):
             resource.create()
 
     def test_delete(self):
-        resource = Resource()
+        resource = self.TestResource()
 
         with self.assertRaises(NotImplementedError):
             resource.delete()
 
     def test_find(self):
         with self.assertRaises(NotImplementedError):
-            Resource.find()
+            self.TestResource.find()
 
     def test_get(self):
         with self.assertRaises(NotImplementedError):
-            Resource.get(None)
+            self.TestResource.get(None)
 
     def test_update(self):
-        resource = Resource()
+        resource = self.TestResource()
 
         with self.assertRaises(NotImplementedError):
             resource.update()
@@ -126,7 +128,6 @@ class TestResource(TestCase):
             resource_to_deserialize.deserialize(data)
 
     def test_deserialize_valid_not_strict(self):
-
         resource_to_serialize = self.TestResourceAdditionalAttribute()
 
         data = resource_to_serialize.serialize()
