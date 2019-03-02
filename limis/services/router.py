@@ -14,13 +14,13 @@ class ServicesRouter:
         Initializes the router with the path specified. Path should be a string without leading or trailing '/'s. An
         optional list of Service objects may be provided to build the initial rules and routers.
 
-        :param path: Path string, will be translated to '/<path>/.*' for rule matching.
+        :param path: Path string, will be translated to '/<path>.*' for rule matching.
         :param services: List of Service objects to initialize the router with.
         """
         self.logger = logging.getLogger(__name__)
         self.path = path
         self._services = {}
-        self._path_rule = '/{}/.*'.format(self.path)
+        self._path_rule = '/{}.*'.format(self.path)
 
         self._http_router_rules = []
         self._websocket_router_rules = []
@@ -39,8 +39,8 @@ class ServicesRouter:
         """
         self.logger.debug(messages.ROUTER_BUILD_ROUTERS)
 
-        self._http_router = RuleRouter([Rule(PathMatches(self._path_rule), RuleRouter(self._http_router_rules))])
-        self._websocket_router = RuleRouter([Rule(PathMatches(self._path_rule), RuleRouter(self._http_router_rules))])
+        self._http_router = RuleRouter(self._http_router_rules)
+        self._websocket_router = RuleRouter(self._http_router_rules)
 
     def _build_router_rules(self):
         """

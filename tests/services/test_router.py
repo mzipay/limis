@@ -57,7 +57,7 @@ class TestServicesRouter(TestCase):
 
     def test_path_rule(self):
         router = ServicesRouter('path')
-        self.assertEqual(router.path_rule, '/path/.*')
+        self.assertEqual(router.path_rule, '/path.*')
 
     def test_http_router(self):
         router = ServicesRouter('path')
