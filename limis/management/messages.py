@@ -1,3 +1,8 @@
+"""
+limis management - messages
+
+Messages used for logging and exception handling.
+"""
 COMMAND_CREATE_PROJECT_RUN_COMPLETED = 'Completed creating limis project: "{}".'
 COMMAND_CREATE_PROJECT_RUN_ERROR = 'Error creating project in directory: "{}".\nError Message: {}'
 COMMAND_CREATE_PROJECT_RUN_STARTED = 'Creating limis project: "{}".'

@@ -1,3 +1,8 @@
+"""
+limis management - exit codes
+
+Management command exit codes.
+"""
 SUCCESS = 0
 INVALID_ARGUMENTS = 100
 PROJECT_IMPROPERLY_CONFIGURED = 200
