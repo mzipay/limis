@@ -91,6 +91,8 @@ class CreateProject(Command):
 
         if not directory:
             directory = Path.cwd() / name
+        else:
+            directory = Path(directory)
 
         project_template_directory = Path(__file__).parent.parent / Path('resources/project_template')
 
@@ -149,7 +151,7 @@ class CreateService(Command):
             print(messages.COMMAND_CREATE_SERVICE_RUN_ERROR.format(str(directory), str(error)))
             return exit_codes.ERROR_CREATING_SERVICE
 
-        replace_template_strings(directory, ['name', 'path'], [name, path])
+        replace_template_strings(directory, ['name', 'path'], [name, name])
 
         print(messages.COMMAND_CREATE_SERVICE_RUN_COMPLETED.format(name))
 
