@@ -1,5 +1,5 @@
 """
-limis server module
+limis server
 
 Application server based on the Tornado framework. Tornado provides base web server, routing and application
 functionality. More information can be found at: `https://www.tornadoweb.org/en/stable/index.html
@@ -50,7 +50,7 @@ class Server:
         self.server = HTTPServer(router)
 
     @property
-    def running(self):
+    def running(self) -> bool:
         """
         Property to get the currently running status of the server.
 
