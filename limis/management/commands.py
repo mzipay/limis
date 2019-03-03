@@ -315,10 +315,10 @@ class Server(Command):
         except ValueError:
             return self.invalid_arguments()
 
-        root_services = get_root_services()
-
         # TODO -  set logging debug based on cls.debug flag
         initialize_logging()
+
+        root_services = get_root_services()
 
         services_router = ServicesRouter(root_services.context_root, root_services.services)
 
