@@ -40,12 +40,20 @@ Service Creation
 
 .. code-block:: python
 
-    from limis.services.handlers import ComponentHTTPHandler
+    from typing import Union
+
+    from tornado.websocket import WebSocketHandler
+    from limis.services.handlers import ComponentHandler
 
 
-    class HelloHandler(ComponentHTTPHandler):
+    class HelloHTTPHandler(ComponentHandler):
         def get(self):
             self.write(self.component_class().hello())
+
+
+    class HelloWebSocketHandler(ComponentHandler, WebSocketHandler):
+        def on_message(self, message: Union[str, bytes]):
+            self.write_message(self.component_class().hello())
 
 * Create a component to perform actions on requests in '<service_name>/components.py':
 
@@ -53,13 +61,14 @@ Service Creation
 
     from limis.services.components import Component
 
-    from hello.handlers import HelloHandler
+    from hello.handlers import HelloHTTPHandler, HelloWebSocketHandler
 
 
     class HelloComponent(Component):
         component_name = 'hello'
         component_path = 'hello'
-        component_http_handler = HelloHandler
+        component_http_handler = HelloHTTPHandler
+        component_websocket_handler = HelloWebSocketHandler
 
         def hello(self):
             return 'hello'
@@ -93,14 +102,33 @@ Launch the limis server from the command prompt:
 
 .. code-block::
 
-    python manage.py server --http
+    python manage.py server --http --websocket
 
 Test Service
 ~~~~~~~~~~~~
 
+* HTTP Service
+
 .. code-block::
 
     curl http://localhost:8080/hello/hello
+
+Output:
+
+.. code-block::
+
+    hello
+
+* WebSocket Service
+
+Example using `websocket-client <https://github.com/websocket-client/websocket-client>`_
+
+.. code-block:: python
+
+    from websocket import create_connection
+    websocket = create_connection('ws://localhost:8888/hello/hello/')
+    websocket.send('test')
+    websocket.recv()
 
 Output:
 
