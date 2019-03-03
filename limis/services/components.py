@@ -30,8 +30,6 @@ class Component(ABC):
     """
     Abstract Base component class to be extended by service component types. Core service component types are:
 
-        * :class:`.MessageQueue`
-        * :class:`.Process`
         * :class:`.Resource`
 
     :attribute component_name: The name of the component.
@@ -43,7 +41,7 @@ class Component(ABC):
     :attribute system_exclude_attributes: Class attribute of system excluded attributes for serialization, this should
       generally not be set by your inherited class.
 
-    The 'component_name' and '_omponent_path' attributes must be set by your inherited component.
+    The 'component_name' and '_component_path' attributes must be set by your inherited component.
     """
     component_name = None
     component_path = None
@@ -183,25 +181,6 @@ class Component(ABC):
         }
 
         return cls._render_json(data, indent=indent, separators=separators, sort_keys=sort_keys)
-
-
-class Process(Component):
-    """
-    Process Component
-
-    The process component is a service component used to represent business or technology actions that are not standard
-    resource operations such as retrieving, creating, updating etc.
-    """
-    # TODO
-
-
-class MessageQueue(Component):
-    """
-    MessageQueue Component
-
-    The message queue component is a service component with functionality to send and receive messages based on events.
-    """
-    # TODO
 
 
 class Resource(Component):
