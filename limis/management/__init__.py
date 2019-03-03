@@ -1,5 +1,5 @@
 """
-limis management module
+limis management
 
 Defines a command line interface framework for working with limis projects.
 """
@@ -84,7 +84,7 @@ class LimisProjectManagement(CommandLineInterface):
     ]
 
 
-def execute_limis_management():
+def execute_limis_management() -> int:
     """
     Executes the limis management command line interface.
 
@@ -93,7 +93,7 @@ def execute_limis_management():
     return LimisManagement.run()
 
 
-def execute_limis_project_management():
+def execute_limis_project_management() -> int:
     """
     Executes the limis project management command line interface.
 

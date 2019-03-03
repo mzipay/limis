@@ -1,5 +1,5 @@
 """
-limis management commands
+limis management - commands
 
 Individual command definition for management command line tool.
 """
@@ -262,7 +262,7 @@ class Server(Command):
             * -d / --debug: Enables debugging mode
             * -p / --http: Enables the HTTP server
             * --http_port=: Sets the HTTP server port, defaults to setting server['default_http_port']
-            * -w / --websocket: Enabgles the WebSocket Server
+            * -w / --websocket: Enables the WebSocket Server
             * --websocket_port=: Sets the WebSocket server port, defaults to setting server['default_http_port']
 
         :param args: List of arguments.
@@ -315,8 +315,7 @@ class Server(Command):
         except ValueError:
             return self.invalid_arguments()
 
-        # TODO -  set logging debug based on cls.debug flag
-        initialize_logging()
+        initialize_logging(debug=self.debug)
 
         root_services = get_root_services()
 

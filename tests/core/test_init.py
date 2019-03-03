@@ -1,5 +1,8 @@
+import io
+import logging
 import os
 
+from contextlib import redirect_stdout
 from distutils.version import StrictVersion
 from pathlib import Path
 from unittest import TestCase
@@ -58,6 +61,13 @@ class TestMethods(TestCase):
             initialize_logging()
 
         os.environ.pop('LIMIS_PROJECT_SETTINGS')
+
+    def test_initialize_logging_with_debug(self):
+        with redirect_stdout(io.StringIO()):
+            initialize_logging(debug=True)
+
+        self.assertEqual(logging.getLogger().level, logging.DEBUG)
+        self.assertEqual(logging.getLogger('limis').level, logging.DEBUG)
 
 
 class TestSettings(TestCase):

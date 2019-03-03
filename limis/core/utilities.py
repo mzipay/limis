@@ -30,12 +30,13 @@ def get_version() -> str:
     return str(StrictVersion('.'.join(map(str, VERSION))))
 
 
-def initialize_logging():
+def initialize_logging(debug: bool = False):
     """
     Initializes logging for the application.
 
     The logging configuration file is determined by the logging['config_file'] setting.
 
+    :param debug: Flag to enable debugging mode.
     :raises ValueError: Error indicating specified logging configuration file does not exist
     """
     logging_config_file = Settings().logging['config_file']
@@ -48,6 +49,10 @@ def initialize_logging():
             raise ValueError(messages.LOGGING_CONFIG_FILE_NOT_FOUND.format(logging_config_file))
 
     logging.config.fileConfig(str(path))
+
+    if debug:
+        logging.getLogger().setLevel(logging.DEBUG)
+        logging.getLogger('limis').setLevel(logging.DEBUG)
 
     logging.getLogger(__name__).debug(messages.LOGGING_INITIALIZED)
 
