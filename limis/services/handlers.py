@@ -5,7 +5,7 @@ from tornado.web import RequestHandler
 from limis.services import Component
 
 
-class ComponentHTTPHandler(RequestHandler):
+class ComponentHandler(RequestHandler):
     """
     Generic component http handler.
 

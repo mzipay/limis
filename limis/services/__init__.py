@@ -77,7 +77,7 @@ class Service:
             self.logger.debug(messages.SERVICE_ADD_COMPONENT_REGISTER_HANDLER.format(
                 self.name, component.component_name, 'websocket_handler'
             ))
-            websocket_handlers = [(r'/.*', component.component_websocket_handler)]
+            websocket_handlers = [(r'/.*', component.component_websocket_handler, dict(component_class=component))]
 
         if component.component_http_handler is None and component.component_websocket_handler is None:
             self.logger.warning(messages.SERVICE_ADD_COMPONENT_WITH_NO_HANDLER.format(

@@ -4,7 +4,6 @@ import time
 import threading
 
 from unittest import TestCase
-
 from tornado.websocket import WebSocketHandler
 from websocket import create_connection
 
@@ -12,17 +11,17 @@ from limis.server import Server
 from limis.services import messages
 from limis.services import Service
 from limis.services.components import Resource
-from limis.services.handlers import ComponentHTTPHandler
+from limis.services.handlers import ComponentHandler
 
 
 class TestService(TestCase):
-    class TestHTTPRequestHandler(ComponentHTTPHandler):
+    class TestHTTPRequestHandler(ComponentHandler):
         response = 'hello world'
 
         def get(self):
             self.write(self.response)
 
-    class TestWebSocketHandler(WebSocketHandler):
+    class TestWebSocketHandler(ComponentHandler, WebSocketHandler):
         response_on_message = 'websocket message received: {}'
 
         def on_message(self, message):

@@ -40,7 +40,7 @@ class ServicesRouter:
         self.logger.debug(messages.ROUTER_BUILD_ROUTERS)
 
         self._http_router = RuleRouter(self._http_router_rules)
-        self._websocket_router = RuleRouter(self._http_router_rules)
+        self._websocket_router = RuleRouter(self._websocket_router_rules)
 
     def _build_router_rules(self):
         """

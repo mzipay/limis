@@ -6,10 +6,7 @@ import json
 import logging
 
 from abc import ABC
-from typing import Any, Dict, List, Tuple, Type, TypeVar
-
-from tornado.web import RequestHandler
-from tornado.websocket import WebSocketHandler
+from typing import Any, Dict, List, Tuple, TypeVar
 
 from limis.core import settings
 from limis.services import messages
