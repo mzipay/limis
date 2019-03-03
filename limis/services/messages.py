@@ -1,3 +1,8 @@
+"""
+limis services - messages
+
+Messages used for logging and exception handling.
+"""
 COMPONENT_ACTION_NOT_IMPLEMENTED_ERROR = '"{}" action is not implemented for this service.'
 COMPONENT_INIT_NOT_PROPERLY_CONFIGURED_ERROR = '"{}" is not properly configured. Attribute "{}" is not type "{}".'
 ROUTER_ADD_SERVICE = 'Adding "{}" service.'

@@ -1,12 +1,15 @@
 """
-limis service components
+limis service - components
+
+Service components, abstract Component class provides base functionality. Resource driven approach included with
+Resource class.
 """
 import inspect
 import json
 import logging
 
 from abc import ABC
-from typing import Any, Dict, List, Tuple, TypeVar
+from typing import Any, Callable, Dict, List, Tuple, TypeVar
 
 from limis.core import settings
 from limis.services import messages
@@ -15,7 +18,7 @@ int_or_string = TypeVar('int_or_string', int, str)
 dict_or_list = TypeVar('dict_or_list', Dict[Any, Any], List[Any])
 
 
-def action(func):
+def action(func) -> Callable:
     """
     Decorator to add the '__action__' attribute to component actions that are callable.
 
@@ -186,7 +189,6 @@ class Component(ABC):
 class Resource(Component):
     """
     Resource
-
     """
     @action
     def create(self):

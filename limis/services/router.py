@@ -1,3 +1,8 @@
+"""
+limis services - router
+
+Services router to generate URL routers between services.
+"""
 import logging
 
 from typing import Dict, List
@@ -9,7 +14,7 @@ from limis.services import messages
 
 
 class ServicesRouter:
-    def __init__(self, path: str, services: List[Service] = []):
+    def __init__(self, path: str, services: List[Service] = None):
         """
         Initializes the router with the path specified. Path should be a string without leading or trailing '/'s. An
         optional list of Service objects may be provided to build the initial rules and routers.
@@ -25,8 +30,9 @@ class ServicesRouter:
         self._http_router_rules = []
         self._websocket_router_rules = []
 
-        for service in services:
-            self.add_service(service)
+        if services:
+            for service in services:
+                self.add_service(service)
 
         self._http_router = None
         self._websocket_router = None

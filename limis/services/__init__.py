@@ -1,5 +1,7 @@
 """
-limis services module
+limis services
+
+Service module, provides ability to create a service with a number of components.
 """
 import logging
 
@@ -23,7 +25,6 @@ class Service:
         :param name: Service name, will be used as the path if 'path' is not provided.
         :param components: List of service components, must inherit from Component class.
         :param path: Path for service, defaults to name.
-        :raises ValueError: Error indicating either the component or handler class is invalid.
         """
         self.logger = logging.getLogger(__name__)
 
@@ -64,6 +65,10 @@ class Service:
             self.name, component.component_name, component.component_path
         ))
 
+        if component.component_http_handler is None and component.component_websocket_handler is None:
+            self.logger.warning(messages.SERVICE_ADD_COMPONENT_WITH_NO_HANDLER.format(
+                component.component_name, self.name))
+
         http_handlers = []
         websocket_handlers = []
 
@@ -78,10 +83,6 @@ class Service:
                 self.name, component.component_name, 'websocket_handler'
             ))
             websocket_handlers = [(r'/.*', component.component_websocket_handler, dict(component_class=component))]
-
-        if component.component_http_handler is None and component.component_websocket_handler is None:
-            self.logger.warning(messages.SERVICE_ADD_COMPONENT_WITH_NO_HANDLER.format(
-                component.component_name, self.name))
 
         http_application = Application(http_handlers)
         websocket_application = Application(websocket_handlers)

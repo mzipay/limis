@@ -1,3 +1,8 @@
+"""
+limis server - handlers
+
+Component handlers.
+"""
 from typing import Type
 
 from tornado.web import RequestHandler
@@ -7,9 +12,13 @@ from limis.services import Component
 
 class ComponentHandler(RequestHandler):
     """
-    Generic component http handler.
+    Generic component handler.
 
     Initialization sets the component class which can be accessed from request methods.
+
+    .. note::
+        WebSocket handlers should inherit from ComponentHandler and tornado.websocket.WebSocketHandler.
+
     """
     def initialize(self, component_class: Type[Component]):
         """
