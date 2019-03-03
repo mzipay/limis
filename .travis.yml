@@ -8,6 +8,7 @@ env:
   - TORNADO=5.0
   - TORNADO=5.1
   - TORNADO=6.0
+  - TORNADO=6.1
 install:
   - pip install -q tornado==$TORNADO
   - pip install -q -r tests/requirements.txt
