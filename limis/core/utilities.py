@@ -21,6 +21,33 @@ from limis.core import Settings
 from limis.core.environment import LIMIS_PROJECT_NAME_ENVIRONMENT_VARIABLE
 
 
+def get_root_services() -> Type:
+    """
+    Returns the root services module as defined in settings. Settings attribute is set by the
+    "<project_name>['root_services']" value. LIMIS_PROJECT_NAME environment variable is used to set the project_name'.
+
+    :raises AttributeError: Error indicating the project is invalid.
+    :raises TypeError: Error indicating root services is an invalid type.
+    :raises ImportError: Error indicating the root services module could not be imported.
+    :returns: Imported module.
+    """
+    project_name = os.environ.get(LIMIS_PROJECT_NAME_ENVIRONMENT_VARIABLE)
+
+    try:
+        root_services_name = getattr(Settings(), project_name)['root_services']
+    except AttributeError:
+        raise AttributeError(messages.GET_ROOT_SERVICES_INVALID_PROJECT_ERROR.format(project_name))
+    except TypeError:
+        raise TypeError(messages.GET_ROOT_SERVICES_INVALID_PROJECT_NAME_TYPE)
+
+    try:
+        module = import_module(root_services_name)
+    except ImportError:
+        raise ImportError(messages.GET_ROOT_SERVICES_IMPORT_ERROR.format(root_services_name))
+
+    return module
+
+
 def get_version() -> str:
     """
     Retrieves the limis version.
@@ -55,33 +82,6 @@ def initialize_logging(debug: bool = False):
         logging.getLogger('limis').setLevel(logging.DEBUG)
 
     logging.getLogger(__name__).debug(messages.LOGGING_INITIALIZED)
-
-
-def get_root_services() -> Type:
-    """
-    Returns the root services module as defined in settings. Settings attribute is set by the
-    "<project_name>['root_services']" value. LIMIS_PROJECT_NAME environment variable is used to set the project_name'.
-
-    :raises AttributeError: Error indicating the project is invalid.
-    :raises TypeError: Error indicating root services is an invalid type.
-    :raises ImportError: Error indicating the root services module could not be imported.
-    :returns: Imported module.
-    """
-    project_name = os.environ.get(LIMIS_PROJECT_NAME_ENVIRONMENT_VARIABLE)
-
-    try:
-        root_services_name = getattr(Settings(), project_name)['root_services']
-    except AttributeError:
-        raise AttributeError(messages.GET_ROOT_SERVICES_INVALID_PROJECT_ERROR.format(project_name))
-    except TypeError:
-        raise TypeError(messages.GET_ROOT_SERVICES_INVALID_PROJECT_NAME_TYPE)
-
-    try:
-        module = import_module(root_services_name)
-    except ImportError:
-        raise ImportError(messages.GET_ROOT_SERVICES_IMPORT_ERROR.format(root_services_name))
-
-    return module
 
 
 def replace_template_strings(directory: Path, template_strings: List[str], value_strings: List[str]):
