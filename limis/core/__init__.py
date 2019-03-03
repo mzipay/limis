@@ -1,75 +1,17 @@
 """
-limis core module
+limis core
 
 Provides solution wide functionality for managing logging, settings, applications, etc.
 """
-import logging
-import logging.config
 import os
 
 from configparser import ConfigParser
-from distutils.version import StrictVersion
-from importlib import import_module
 from pathlib import Path
 from setuptools import find_packages
 from typing import List
 
-from limis import VERSION
 from limis.core import messages
-from limis.core.environment import LIMIS_PROJECT_NAME_ENVIRONMENT_VARIABLE, LIMIS_PROJECT_SETTINGS_ENVIRONMENT_VARIABLE
-
-
-def get_version() -> str:
-    """
-    Retrieves the version of this module.
-
-    :return: String with the strict current version
-    """
-    return str(StrictVersion('.'.join(map(str, VERSION))))
-
-
-def initialize_logging():
-    """
-    Initializes logging for the application.
-
-    The logging configuration file is determined by the logging['config_file'] setting.
-
-    :raises ValueError: Error indicating specified logging configuration file does not exist
-    """
-    logging_config_file = Settings().logging['config_file']
-
-    path = Path(logging_config_file)
-    if not path.exists():
-        path = Path(__file__).parent / logging_config_file
-
-        if not path.exists():
-            raise ValueError(messages.LOGGING_CONFIG_FILE_NOT_FOUND.format(logging_config_file))
-
-    logging.config.fileConfig(str(path))
-
-    logging.getLogger(__name__).debug(messages.LOGGING_INITIALIZED)
-
-
-def get_root_services():
-    """
-    Returns the root services module as defined in settings. Settings attribute is set by the
-    "<project_name>['root_services']" value. LIMIS_PROJECT_NAME environment variable is used to set the project_name'.
-    """
-    project_name = os.environ.get(LIMIS_PROJECT_NAME_ENVIRONMENT_VARIABLE)
-
-    try:
-        root_services_name = getattr(Settings(), project_name)['root_services']
-    except AttributeError:
-        raise AttributeError(messages.GET_ROOT_SERVICES_INVALID_PROJECT_ERROR.format(project_name))
-    except TypeError:
-        raise TypeError(messages.GET_ROOT_SERVICES_INVALID_PROJECT_NAME_TYPE)
-
-    try:
-        module = import_module(root_services_name)
-    except ImportError:
-        raise ImportError(messages.GET_ROOT_SERVICES_IMPORT_ERROR.format(root_services_name))
-
-    return module
+from limis.core.environment import LIMIS_PROJECT_SETTINGS_ENVIRONMENT_VARIABLE
 
 
 class Settings:

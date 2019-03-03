@@ -15,8 +15,8 @@ from typing import Any, List
 
 from tornado.routing import RuleRouter
 
-from limis.core import get_root_services, get_version, initialize_logging, settings
-from limis.core.utilities import replace_template_strings
+from limis.core import settings
+from limis.core.utilities import get_root_services, get_version, initialize_logging, replace_template_strings
 from limis.management import exit_codes, messages
 from limis.server import Server as LimisServer
 from limis.services.router import ServicesRouter

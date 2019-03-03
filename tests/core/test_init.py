@@ -5,7 +5,8 @@ from pathlib import Path
 from unittest import TestCase
 
 import limis
-from limis.core import get_root_services, get_version, initialize_logging, Settings
+from limis.core import Settings
+from limis.core.utilities import get_root_services, get_version, initialize_logging
 from tests import remove_logfile
 
 
