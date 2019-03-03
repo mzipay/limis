@@ -1,6 +1,5 @@
 import io
 import os
-import shutil
 import signal
 import time
 
@@ -10,11 +9,11 @@ from threading import Thread
 from typing import List
 from unittest import TestCase
 
-from limis.core import settings
+from limis.core import environment, settings
 from limis.management import exit_codes
 from limis.management.commands import Command, CreateProject, CreateService, Server, Version
 
-from tests import listening, string_in_file
+from tests import listening, remove_directory, string_in_file
 
 
 class TestCommand(TestCase):
@@ -24,102 +23,111 @@ class TestCommand(TestCase):
 
 
 class TestCreateProject(TestCase):
-    def __remove_test_project_directories(self):
-        if self.test_project_default_directory.exists():
-            shutil.rmtree(str(self.test_project_default_directory), ignore_errors=False)
+    test_project_name = 'test_project'
+    test_project_default_directory = Path.cwd() / 'test_project'
+    test_project_directory = Path.cwd() / 'test_project_directory'
 
-        if self.test_project_directory.exists():
-            shutil.rmtree(str(self.test_project_directory), ignore_errors=False)
+    def _validate_test_run(self, name: str, directory: Path):
+        self.assertTrue(directory.exists())
+        self.assertTrue((directory / name).exists())
 
-    def setUp(self):
-        self.test_project_name = 'test_project'
-        self.test_project_default_directory = Path.cwd() / 'test_project'
-        self.test_project_directory = Path.cwd() / 'test_project_directory'
-
-        self.__remove_test_project_directories()
+        self.assertTrue(string_in_file(str(directory / 'management.py'), 'name = \'{}\''.format(name)))
 
     def tearDown(self):
-        self.__remove_test_project_directories()
+        remove_directory(self.test_project_directory)
+        remove_directory(self.test_project_default_directory)
 
     def test_run(self):
+        name = self.test_project_name
+        directory = self.test_project_default_directory
+
+        command = CreateProject()
+
         with redirect_stdout(io.StringIO()):
-            command = CreateProject()
+            self.assertEqual(command.run([name, directory]), exit_codes.SUCCESS)
+
+        self._validate_test_run(name, directory)
+
+    def test_run_with_directory(self):
+        name = self.test_project_name
+        directory = self.test_project_directory
+
+        command = CreateProject()
+
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(command.run([name, str(directory)]), exit_codes.SUCCESS)
+
+        self._validate_test_run(name, directory)
+
+    def test_run_with_existing_directory(self):
+        name = self.test_project_name
+        directory = self.test_project_default_directory
+
+        command = CreateProject()
+
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(command.run([name, directory]), exit_codes.SUCCESS)
+            self.assertEqual(command.run([name, directory]), exit_codes.ERROR_CREATING_PROJECT)
+
+    def test_run_with_invalid_arguments(self):
+        command = CreateProject()
+
+        with redirect_stdout(io.StringIO()):
             self.assertEqual(command.run([]), exit_codes.INVALID_ARGUMENTS)
-
-            self.assertEqual(command.run([self.test_project_name]), exit_codes.SUCCESS)
-            self.assertTrue(self.test_project_default_directory.exists())
-            self.assertTrue((self.test_project_default_directory / self.test_project_name).exists())
-
-            with open(str(self.test_project_default_directory / 'management.py')) as file:
-                self.assertTrue(file.read(), 'name = \'{}\''.format(self.test_project_name))
-                file.close()
-
-            self.assertEqual(command.run([self.test_project_name, self.test_project_directory]),
-                             exit_codes.SUCCESS)
-            self.assertTrue(self.test_project_directory.exists())
-            self.assertTrue((self.test_project_directory / self.test_project_name).exists())
-
-            with open(str(self.test_project_directory / 'management.py')) as file:
-                self.assertTrue(file.read(), 'name = \'{}\''.format(self.test_project_name))
-                file.close()
-
-            self.assertEqual(command.run([self.test_project_name]), exit_codes.ERROR_CREATING_PROJECT)
 
 
 class TestCreateService(TestCase):
-    def __remove_test_service_directories(self):
-        if self.test_service_directory.exists():
-            shutil.rmtree(str(self.test_service_directory), ignore_errors=False)
+    test_service_name = 'test_service'
+    test_service_path = 'test_service_path'
+    test_service_default_directory = Path.cwd() / 'test_service'
+    test_service_directory = Path.cwd() / 'test_service_path'
 
-        if self.test_service_with_path_directory.exists():
-            shutil.rmtree(str(self.test_service_with_path_directory), ignore_errors=False)
+    def _validate_test_run(self, name: str, directory: Path):
+        self.assertTrue(directory.exists())
 
-
-    def setUp(self):
-        self.test_service_name = 'test_service'
-        self.test_service_path = 'test_service_path'
-        self.test_service_directory = Path.cwd() / 'test_service'
-        self.test_service_with_path_directory = Path.cwd() / 'test_service_path'
-
-        self.__remove_test_service_directories()
+        self.assertTrue(string_in_file(str(directory / 'services.py'),
+                                       'Service(name=\'{}\', path=\'{}\', components=[]),'.format(name, name)))
 
     def tearDown(self):
-        self.__remove_test_service_directories()
+        remove_directory(self.test_service_default_directory)
+        remove_directory(self.test_service_directory)
 
     def test_run(self):
-        with redirect_stdout(io.StringIO()):
-            command = CreateService()
+        name = self.test_service_name
+        directory = self.test_service_default_directory
 
+        command = CreateService()
+
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(command.run([name]), exit_codes.SUCCESS)
+
+        self._validate_test_run(name, directory)
+
+    def test_run_with_directory(self):
+        name = self.test_service_name
+        directory = self.test_service_directory
+
+        command = CreateService()
+
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(command.run([name, str(directory)]), exit_codes.SUCCESS)
+
+        self._validate_test_run(name, directory)
+
+    def test_run_with_existing_directory(self):
+        name = self.test_service_name
+
+        command = CreateService()
+
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(command.run([name]), exit_codes.SUCCESS)
+            self.assertEqual(command.run([name]), exit_codes.ERROR_CREATING_SERVICE)
+
+    def test_run_with_invalid_arguments(self):
+        command = CreateService()
+
+        with redirect_stdout(io.StringIO()):
             self.assertEqual(command.run([]), exit_codes.INVALID_ARGUMENTS)
-
-            self.assertEqual(command.run([self.test_service_name]), exit_codes.SUCCESS)
-            self.assertTrue(self.test_service_directory.exists())
-
-            test_service_services_file = str(self.test_service_directory / 'services.py')
-
-            self.assertTrue(string_in_file(test_service_services_file,
-                                           'Service(name=\'{}\', path=\'{}\', components=[]),'
-                                           .format(self.test_service_name, self.test_service_name)))
-
-            self.assertEqual(command.run([self.test_service_name]), exit_codes.ERROR_CREATING_SERVICE)
-
-    def test_run_with_path(self):
-        with redirect_stdout(io.StringIO()):
-            command = CreateService()
-
-            self.assertEqual(command.run([self.test_service_name, self.test_service_path]),
-                             exit_codes.SUCCESS)
-
-            self.assertTrue(self.test_service_with_path_directory.exists())
-
-            test_service_services_file = str(self.test_service_with_path_directory / 'services.py')
-
-            self.assertTrue(string_in_file(test_service_services_file,
-                                           'Service(name=\'{}\', path=\'{}\', components=[]),'
-                                           .format(self.test_service_name, self.test_service_name)))
-
-            self.assertEqual(command.run([self.test_service_name, self.test_service_path]),
-                             exit_codes.ERROR_CREATING_SERVICE)
 
 
 class TestServer(TestCase):
@@ -144,8 +152,8 @@ class TestServer(TestCase):
 
         settings_file = cls.project_directory / cls.project_name / 'settings.ini'
 
-        os.environ['LIMIS_PROJECT_NAME'] = cls.project_name
-        os.environ['LIMIS_PROJECT_SETTINGS'] = str(settings_file)
+        os.environ[environment.LIMIS_PROJECT_NAME_ENVIRONMENT_VARIABLE] = cls.project_name
+        os.environ[environment.LIMIS_PROJECT_SETTINGS_ENVIRONMENT_VARIABLE] = str(settings_file)
 
         if settings_file.exists():
             settings_file.unlink()
@@ -156,11 +164,10 @@ class TestServer(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        if cls.project_directory.exists():
-                shutil.rmtree(str(cls.project_directory), ignore_errors=False)
+        remove_directory(cls.project_directory)
 
-        os.environ.pop('LIMIS_PROJECT_NAME')
-        os.environ.pop('LIMIS_PROJECT_SETTINGS')
+        os.environ.pop(environment.LIMIS_PROJECT_NAME_ENVIRONMENT_VARIABLE)
+        os.environ.pop(environment.LIMIS_PROJECT_SETTINGS_ENVIRONMENT_VARIABLE)
 
     def setUp(self):
         try:
@@ -225,6 +232,15 @@ class TestServer(TestCase):
             with redirect_stdout(io.StringIO()):
                 command.parse_arguments(['--http_port'])
 
+    def test_parse_arguments_websocket(self):
+        command = Server()
+        command.parse_arguments(args=['-w'])
+        self.assertTrue(command.websocket)
+
+        command = Server()
+        command.parse_arguments(args=['--websocket'])
+        self.assertTrue(command.websocket)
+
     def test_parse_arguments_websocket_port(self):
         command = Server()
         command.parse_arguments(['--websocket_port', '8000'])
@@ -240,25 +256,17 @@ class TestServer(TestCase):
             with redirect_stdout(io.StringIO()):
                 command.parse_arguments(['--websocket_port'])
 
-    def test_parse_arguments_websocket(self):
-        command = Server()
-        command.parse_arguments(args=['-w'])
-        self.assertTrue(command.websocket)
-
-        command = Server()
-        command.parse_arguments(args=['--websocket'])
-        self.assertTrue(command.websocket)
-
     def test_run(self):
         thread = Thread(target=self.__run_command, kwargs={'args': []})
         thread.daemon = True
         thread.start()
-        time.sleep(3)
+        time.sleep(2)
 
         self.assertTrue(listening(int(settings.server['default_http_port'])))
 
     def test_run_invalid_arguments(self):
         command = Server()
+
         with redirect_stdout(io.StringIO()):
             self.assertEqual(command.run(args=['--http_port', 'invalid']), exit_codes.INVALID_ARGUMENTS)
 
@@ -266,7 +274,7 @@ class TestServer(TestCase):
         thread = Thread(target=self.__run_command, kwargs={'args': ['-p']})
         thread.daemon = True
         thread.start()
-        time.sleep(3)
+        time.sleep(2)
 
         self.assertTrue(listening(int(settings.server['default_http_port'])))
 
@@ -274,7 +282,7 @@ class TestServer(TestCase):
         thread = Thread(target=self.__run_command, kwargs={'args': ['-p', '--http_port=8001']})
         thread.daemon = True
         thread.start()
-        time.sleep(3)
+        time.sleep(2)
 
         self.assertTrue(listening(8001))
 
@@ -282,7 +290,7 @@ class TestServer(TestCase):
         thread = Thread(target=self.__run_command, kwargs={'args': ['-w']})
         thread.daemon = True
         thread.start()
-        time.sleep(3)
+        time.sleep(2)
 
         self.assertTrue(listening(int(settings.server['default_websocket_port'])))
 
@@ -290,7 +298,7 @@ class TestServer(TestCase):
         thread = Thread(target=self.__run_command, kwargs={'args': ['-w', '--websocket_port=8001']})
         thread.daemon = True
         thread.start()
-        time.sleep(3)
+        time.sleep(2)
 
         self.assertTrue(listening(8001))
 
@@ -298,7 +306,7 @@ class TestServer(TestCase):
         thread = Thread(target=self.__run_command, kwargs={'args': ['-p', '-w']})
         thread.daemon = True
         thread.start()
-        time.sleep(3)
+        time.sleep(2)
 
         self.assertTrue(listening(int(settings.server['default_http_port'])))
         self.assertTrue(listening(int(settings.server['default_websocket_port'])))
@@ -308,7 +316,7 @@ class TestServer(TestCase):
                         kwargs={'args': ['-p', '--http_port=8001', '-w', '--websocket_port=8002']})
         thread.daemon = True
         thread.start()
-        time.sleep(3)
+        time.sleep(2)
 
         self.assertTrue(listening(8001))
         self.assertTrue(listening(8002))
