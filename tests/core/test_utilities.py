@@ -100,8 +100,8 @@ class TestMethods(TestCase):
         replace_template_strings(TestMethods.template_test_directory, ['variable0', 'variable1'], ['test0', 'test1'])
 
         files = [
-            TestMethods.template_test_directory / 'test',
-            TestMethods.template_test_sub_directory / 'test'
+            str(TestMethods.template_test_directory / 'test'),
+            str(TestMethods.template_test_sub_directory / 'test')
         ]
 
         for file in files:
