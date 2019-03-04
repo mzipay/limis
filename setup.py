@@ -1,7 +1,7 @@
 import io
 from setuptools import find_packages, setup
 
-from limis.core import get_version
+from limis.core.utilities import get_version
 
 with io.open('README.rst', 'rt', encoding='utf8') as file:
     readme = file.read()
