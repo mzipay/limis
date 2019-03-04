@@ -1,9 +1,11 @@
-limis - light microservice solution
-===================================
-`limis <https://limis.io>`_ provides a framework for creating small services. A RESTful approach to services is
-followed. In addition to traditional HTTP services a WebSocket layer is also provided. WebSockets are highly beneficial
-for services due to their two-way communication pattern and single socket connection for multiple calls.
-`Tornado <https://www.tornadoweb.org>`_ provides the communication back-bone for limis, The Tornado framework enables
+limis - light microservices
+===========================
+`limis <https://limis.io>`_ is a framework for creating microservices on a ligh flexible platform. A RESTful approach
+to services is followed. In addition to traditional HTTP services a WebSocket transport is provided. WebSockets are
+highly beneficial for services due to their two-way communication pattern and single socket connection for multiple
+calls.
+
+`Tornado <https://www.tornadoweb.org>`_ provides the communication backbone for limis, The Tornado framework enables
 limis to build services on a well established transport platform.
 
 .. warning:: limis is currently an alpha release. There may be significant bugs, and class, methods, variable names may
@@ -15,14 +17,13 @@ limis to build services on a well established transport platform.
 
     introduction/overview
     introduction/installation
+    introduction/management
 
 .. toctree::
     :maxdepth: 2
-    :caption: Reference
+    :caption: Module API
 
     modules/core
     modules/management
     modules/server
     modules/services
-
-    documentation_index

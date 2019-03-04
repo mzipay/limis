@@ -2,15 +2,15 @@ import os
 import sys
 sys.path.append(os.path.abspath('../..'))
 
-import limis.core
+import limis.core.utilities
 
 
 project = 'limis'
 copyright = '2019, Philip Streck'
 author = 'Philip Streck'
 
-version = limis.core.get_version()
-release = limis.core.get_version()
+version = limis.core.utilities.get_version()
+release = limis.core.utilities.get_version()
 
 
 extensions = [

@@ -14,6 +14,9 @@ from limis.services import messages
 
 
 class ServicesRouter:
+    """
+    Services Router
+    """
     def __init__(self, path: str, services: List[Service] = None):
         """
         Initializes the router with the path specified. Path should be a string without leading or trailing '/'s. An
